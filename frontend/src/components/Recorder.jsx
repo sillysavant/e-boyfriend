@@ -2,14 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import activeAssistantIcon from "../assets/active.gif";
-import notActiveAssistantIcon from "../assets/notactive.png";
+import notActiveAssistantIcon from "../assets/inactive.png";
 
 const mimeType = "audio/webm";
 
 function Recorder({ uploadAudio }) {
   const mediaRecorder = useRef(null);
-  const [pending, setPending] = useState(false);
-  const pendingRef = useRef(false);
+  const pending = false;
   const [permission, setPermission] = useState(false);
   const [stream, setStream] = useState(null);
   const [recordingStatus, setRecordingStatus] = useState("inactive");
@@ -40,11 +39,7 @@ function Recorder({ uploadAudio }) {
   const startRecording = async () => {
     if (mediaRecorder.current === null || stream === null) return;
 
-    if (pendingRef.current) return;
-
     setRecordingStatus("recording");
-    pendingRef.current = true;
-    setPending(true);
     const media = new MediaRecorder(stream, { mimeType: mimeType });
     mediaRecorder.current = media;
     mediaRecorder.current.start();
@@ -60,8 +55,6 @@ function Recorder({ uploadAudio }) {
   const stopRecording = () => {
     if (mediaRecorder.current === null) return;
 
-    if (pending) return;
-
     setRecordingStatus("inactive");
     mediaRecorder.current.stop();
     mediaRecorder.current.onstop = () => {
@@ -70,51 +63,38 @@ function Recorder({ uploadAudio }) {
       setAudio(audioUrl);
       uploadAudio(audioBlob);
       setAudioChunks([]);
-      setPending(false);
     };
   };
 
-  console.log(pending);
+  console.log(recordingStatus);
 
   return (
-    <div>
+    <div className="flex justify-center">
       {!permission ? (
         <button onClick={getMicrophonePermission} type="button">
           Get Microphone
         </button>
       ) : null}
 
-      {pending && (
-        <img
-          src={activeAssistantIcon}
-          alt="Recording"
-          width={350}
-          height={350}
-          onClick={stopRecording}
-          className="assistant grayscale"
-        />
-      )}
-
-      {permission && recordingStatus === "inactive" && !pending ? (
+      {permission && recordingStatus === "inactive" ? (
         <img
           src={notActiveAssistantIcon}
           alt="Not Recording"
-          width={350}
-          height={350}
+          width={70}
+          height={70}
           onClick={startRecording}
           className="assistant cursor-pointer hover:scale-110 duration-150 transition-all ease-in-out"
         />
-      ) : null}
-      {recordingStatus === "recording" ? (
+      ) : (
         <img
           src={activeAssistantIcon}
           alt="Recording"
-          width={350}
-          height={350}
+          width={70}
+          height={70}
           onClick={stopRecording}
           className="assistant cursor-pointer hover:scale-110 duration-150 transition-all ease-in-out"
         />
-      ) : null}
+      )}
     </div>
   );
 }
