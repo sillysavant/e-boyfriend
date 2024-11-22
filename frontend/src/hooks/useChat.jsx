@@ -5,14 +5,15 @@ const backendUrl = "http://localhost:3000";
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
-  const chat = async (message) => {
+  const chat = async (audioBlob) => {
     setLoading(true);
+
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "recording.webm");
+
     const data = await fetch(`${backendUrl}/chat`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message }),
+      body: formData,
     });
     const resp = (await data.json()).messages;
     setMessages((messages) => [...messages, ...resp]);
