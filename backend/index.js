@@ -4,9 +4,10 @@ import dotenv from "dotenv";
 import express, { json } from "express";
 import { promises as fs } from "fs";
 import transcripts from "./actions/transcripts.js";
-import generateCompletion  from "./actions/generateCompletion.js";
-import createAudioFileFromText from "./actions/createAudioFileFromText.js"
+import generateCompletion from "./actions/generateCompletion.js";
+import createAudioFileFromText from "./actions/createAudioFileFromText.js";
 import multer from "multer";
+import { ElevenLabsClient, play } from "elevenlabs";
 dotenv.config();
 
 const app = express();
@@ -15,6 +16,10 @@ app.use(cors());
 const port = 3000;
 const upload = multer();
 const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY;
+
+const elevenlabs = new ElevenLabsClient({
+  apiKey: elevenLabsApiKey,
+});
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -105,21 +110,21 @@ app.post("/chat", upload.single("audio"), async (req, res) => {
           lipsync: await readJsonTranscript("audios/api_0.json"),
           facialExpression: "smile",
           animation: "Laughing",
-        }
-      ]
+        },
+      ],
     });
     return;
   }
 
-  if (audioFile){
+  if (audioFile) {
     const formData = new FormData();
     const audioBlob = new Blob([audioFile.buffer], { type: "audio/webm" });
     formData.append("audio", audioBlob, audioFile.originalname);
-    
+
     const transcriptionResult = await transcripts(formData);
     if (transcriptionResult.error) {
-      return res.status(400).send({ 
-        error: transcriptionResult.error 
+      return res.status(400).send({
+        error: transcriptionResult.error,
       });
     }
     userMessage = transcriptionResult.transcribedText;
@@ -131,7 +136,7 @@ app.post("/chat", upload.single("audio"), async (req, res) => {
     return res.status(500).send({ error: completionResult.error });
   }
   // NOTE: vulnerable since gpt is not always returning json array (incomplete json)
-  try{
+  try {
     let messages = JSON.parse(completionResult.response);
     if (messages.messages) {
       messages = messages.messages;
