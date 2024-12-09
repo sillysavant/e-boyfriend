@@ -61,7 +61,7 @@ export const Experience = () => {
       <Suspense>
         <Dots position-y={1.75} position-x={-0.02} />
       </Suspense>
-      <AvatarBoy />
+      <Avatar />
       <ContactShadows opacity={0.7} />
     </>
   );
