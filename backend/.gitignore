@@ -1,0 +1,5 @@
+.env
+/env/*
+/app/audio/*
+/app/logs/*
+*.wav

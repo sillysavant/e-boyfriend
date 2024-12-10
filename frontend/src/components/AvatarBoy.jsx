@@ -107,15 +107,15 @@ let setupMode = false;
 
 export function AvatarBoy(props) {
   const { nodes, materials, scene } = useGLTF(
-    "../../public/models/6730b367fdcd01ce50153061.glb"
+    "/models/6730b367fdcd01ce50153061.glb"
   );
 
-  const { message, onMessagePlayed, chat } = useChat();
+  const { message, onMessagePlayed, chat, audioRes } = useChat();
 
   const [lipsync, setLipsync] = useState();
 
   useEffect(() => {
-    console.log(message);
+    console.log("Avatar:", JSON.stringify(message, null, 2));
     if (!message) {
       setAnimation("Idle");
       return;
@@ -123,11 +123,11 @@ export function AvatarBoy(props) {
     setAnimation(message.animation);
     setFacialExpression(message.facialExpression);
     setLipsync(message.lipsync);
-    const audio = new Audio("data:audio/mp3;base64," + message.audio);
+    const audio = new Audio("data:audio/mp3;base64," + audioRes);
     audio.play();
     setAudio(audio);
     audio.onended = onMessagePlayed;
-  }, [message]);
+  }, [audioRes]);
 
   const { animations } = useGLTF("/models/animations.glb");
 
@@ -374,3 +374,4 @@ export function AvatarBoy(props) {
 }
 
 useGLTF.preload("/6730b367fdcd01ce50153061.glb");
+useGLTF.preload("/models/animations.glb");

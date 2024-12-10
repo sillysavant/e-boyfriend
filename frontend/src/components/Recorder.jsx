@@ -6,11 +6,10 @@ import notActiveAssistantIcon from "../assets/inactive.png";
 
 const mimeType = "audio/webm";
 
-function Recorder({ uploadAudio }) {
-  const mediaRecorder = useRef(null);
-  const pending = false;
+function Recorder({ uploadAudio, loading }) {
+  const mediaRecorder = useRef();
   const [permission, setPermission] = useState(false);
-  const [stream, setStream] = useState(null);
+  const [stream, setStream] = useState();
   const [recordingStatus, setRecordingStatus] = useState("inactive");
   const [audioChunks, setAudioChunks] = useState([]);
   const [audio, setAudio] = useState(null);
@@ -66,17 +65,13 @@ function Recorder({ uploadAudio }) {
     };
   };
 
-  console.log(recordingStatus);
-
   return (
     <div className="flex justify-center">
       {!permission ? (
         <button onClick={getMicrophonePermission} type="button">
           Get Microphone
         </button>
-      ) : null}
-
-      {permission && recordingStatus === "inactive" ? (
+      ) : recordingStatus === "inactive" ? (
         <img
           src={notActiveAssistantIcon}
           alt="Not Recording"
@@ -84,6 +79,7 @@ function Recorder({ uploadAudio }) {
           height={70}
           onClick={startRecording}
           className="assistant cursor-pointer hover:scale-110 duration-150 transition-all ease-in-out"
+          disabled={loading}
         />
       ) : (
         <img
