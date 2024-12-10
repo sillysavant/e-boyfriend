@@ -111,12 +111,12 @@ export function Avatar(props) {
     "/models/64f1a714fe61576b46f27ca2.glb"
   );
 
-  const { message, onMessagePlayed, chat } = useChat();
+  const { message, onMessagePlayed, chat, audioRes } = useChat();
 
   const [lipsync, setLipsync] = useState();
 
   useEffect(() => {
-    console.log(message);
+    console.log("Avatar:", JSON.stringify(message, null, 2));
     if (!message) {
       setAnimation("Idle");
       return;
@@ -124,11 +124,11 @@ export function Avatar(props) {
     setAnimation(message.animation);
     setFacialExpression(message.facialExpression);
     setLipsync(message.lipsync);
-    const audio = new Audio("data:audio/mp3;base64," + message.audio);
+    const audio = new Audio("data:audio/mp3;base64," + audioRes);
     audio.play();
     setAudio(audio);
     audio.onended = onMessagePlayed;
-  }, [message]);
+  }, [audioRes]);
 
   const { animations } = useGLTF("/models/animations.glb");
 

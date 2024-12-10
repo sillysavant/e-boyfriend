@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useRef } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 
 // Create an axios instance with base URL
@@ -14,7 +14,20 @@ export const ChatProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [cameraZoomed, setCameraZoomed] = useState(false);
-  const audioRef = useRef(null);
+  const [audioRes, setAudioRes] = useState();
+  const [messages, setMessages] = useState([]);
+
+  const onMessagePlayed = () => {
+    setMessages((messages) => messages.slice(1));
+  };
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      setMessage(messages[0]);
+    } else {
+      setMessage(null);
+    }
+  }, [messages]);
 
   const chat = async (audioBlob) => {
     if (loading) return;
@@ -36,16 +49,11 @@ export const ChatProvider = ({ children }) => {
       // Step 2: Send transcribed text to /chat endpoint
       const chatResponse = await api.post("/chat", { text: transcribedText });
 
-      setMessage(chatResponse.data);
+      console.log(chatResponse);
 
-      if (chatResponse.data.audio_url) {
-        if (!audioRef.current) {
-          audioRef.current = new Audio();
-        }
-
-        audioRef.current.src = chatResponse.data.audio_url;
-        await audioRef.current.play();
-      }
+      setAudioRes(chatResponse.data.audio);
+      const messagesRes = chatResponse.data.messages;
+      setMessages((messages) => [...messages, ...messagesRes]);
     } catch (error) {
       console.error("Chat error:", error);
     } finally {
@@ -57,11 +65,13 @@ export const ChatProvider = ({ children }) => {
   return (
     <ChatContext.Provider
       value={{
+        audioRes,
         chat,
-        loading,
         message,
+        loading,
         cameraZoomed,
         setCameraZoomed,
+        onMessagePlayed,
       }}
     >
       {children}

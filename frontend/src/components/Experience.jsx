@@ -8,6 +8,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useChat } from "../hooks/useChat";
 import { Avatar } from "./Avatar";
 import { AvatarBoy } from "./AvatarBoy";
+import { Girlfriend } from "./Girlfriend";
 
 const Dots = (props) => {
   const { loading } = useChat();
@@ -61,7 +62,7 @@ export const Experience = () => {
       <Suspense>
         <Dots position-y={1.75} position-x={-0.02} />
       </Suspense>
-      <Avatar />
+      <Girlfriend />
       <ContactShadows opacity={0.7} />
     </>
   );
