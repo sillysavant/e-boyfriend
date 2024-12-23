@@ -125,6 +125,7 @@ export function Girlfriend(props) {
     setFacialExpression(message.facialExpression);
     setLipsync(message.lipsync);
     const audio = new Audio("data:audio/mp3;base64," + audioRes);
+    console.log("audio", audio);
     audio.play();
     setAudio(audio);
     audio.onended = onMessagePlayed;

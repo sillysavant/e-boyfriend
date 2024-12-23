@@ -49,7 +49,7 @@ def chat(
     # Convert chatbot text to speech
     text_to_speech(response_detail)
 
-    audio_file = "/Users/longtv/Documents/Hackathon/eboyfriend-backend/static/output.wav"
+    audio_file = "/Users/longtv/Documents/Hackathon/e-boyfriend/backend/static/output.wav"
     
     audio_base64=convert_audio_to_base64(audio_file)
     response_detail['audio'] = audio_base64
