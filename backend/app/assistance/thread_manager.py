@@ -1,3 +1,4 @@
+# Created: dylannguyen
 from fastapi import HTTPException
 import openai
 import json
@@ -11,14 +12,19 @@ class ThreadManager:
         self.thread = None
         self.session = session
 
-    def create_thread(self):
-        print("is thread_id in self.session: ", 'thread_id' in self.session)
-        if 'thread_id' not in self.session:
+    async def create_thread(self):
+        try:
+            #print(f"is thread_id in {self.session}: ", 'thread_id' in self.session)
+            if 'thread_id' not in self.session:
+                thread_obj = self.client.beta.threads.create()
+                self.session['thread_id'] = thread_obj.id
+                self.thread = thread_obj
+            else:
+                self.retrieve_thread(thread_id= self.session['thread_id'])
+        except openai.NotFoundError as e:
             thread_obj = self.client.beta.threads.create()
             self.session['thread_id'] = thread_obj.id
             self.thread = thread_obj
-        else:
-            self.retrieve_thread(thread_id= self.session['thread_id'])
     
     def retrieve_thread(self, thread_id):
         self.thread = self.client.beta.threads.retrieve(thread_id=thread_id)
@@ -42,6 +48,13 @@ class ThreadManager:
 
         response_message = message_content.value
         return response_message
+
+    def get_messages(self):
+        messages = self.client.beta.threads.messages.list(
+            thread_id=self.thread.id,
+            limit=100
+        )
+        return messages
     
     def run_assistant(self, assistant_id):
         if not self.thread:

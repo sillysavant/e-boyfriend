@@ -9,7 +9,7 @@ from azure.cognitiveservices.speech import (
 import tempfile
 from app.constant.config import AZURE_REGION_SERVICE, AZURE_SPEECH_KEY
 
-def transcript(audio_file: bytes):
+async def transcript(audio_file: bytes):
     """
     Transcribes audio to text using Azure Speech SDK.
 

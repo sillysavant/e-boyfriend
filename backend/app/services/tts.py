@@ -4,7 +4,7 @@ from app.constant.config import AZURE_REGION_SERVICE, AZURE_SPEECH_KEY
 from azure.cognitiveservices.speech import SpeechConfig, SpeechSynthesizer, AudioConfig, ResultReason
 from fastapi import HTTPException, status
 
-def text_to_speech(response: dict):
+async def text_to_speech(response: dict):
     """
     Extracts the text from all messages and converts concatenated text to speech using Azure Speech SDK.
 
@@ -68,13 +68,13 @@ def text_to_speech(response: dict):
 
         # Detailed error checking
         if result.reason == ResultReason.SynthesizingAudioCompleted:
-            print(f"Speech synthesized to [{output_file}]")
+            #print(f"Speech synthesized to [{output_file}]")
             return True
         elif result.reason == ResultReason.Canceled:
             cancellation_details = result.cancellation_details
-            print(f"Speech synthesis canceled: {cancellation_details.reason}")
+            #print(f"Speech synthesis canceled: {cancellation_details.reason}")
             if cancellation_details.reason == ResultReason.Error:
-                print(f"Error details: {cancellation_details.error_details}")
+                #print(f"Error details: {cancellation_details.error_details}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Speech synthesis error: {cancellation_details.error_details}"

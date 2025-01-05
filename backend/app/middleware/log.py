@@ -67,7 +67,6 @@ class APIGatewayMiddleware(BaseHTTPMiddleware):
             decoded_request_body = request_body
         except UnicodeDecodeError:
             decoded_request_body = str(request_body)
-            
         log_entry = LogModel(
             action_date= datetime.now(),
             path_name=original_path,
