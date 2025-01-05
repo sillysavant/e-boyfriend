@@ -7,11 +7,9 @@ pyautogen==0.4.1
 pydantic==2.10.3
 flaml[automl]
 autogen-agentchat[retrievechat-pgvector]~=0.2
-autogen-agentchat[teachable]~=0.2
 langchain==0.3.13
 langchain_openai==0.2.1
 langchain-community==0.3.11
-chromadb==0.5.21
 autogen-agentchat[long-context]~=0.2
 azure-cognitiveservices-speech==1.41.1
 aioredis==2.0.1 
@@ -25,3 +23,4 @@ azure-storage-blob==12.14.1
 PyPDF2==3.0.1
 azure-search-documents==11.5.2
 asyncstdlib==3.13.0
+greenlet==3.1.1
