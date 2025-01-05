@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 OPENAI_MODEL = "gpt-4o-mini"
-OPENAPI_KEY = os.getenv("OPEN_API_KEY")
+OPENAPI_KEY = os.getenv("OPENAI_API_KEY")
 ELEVENLABS_API_KEY=os.getenv("ELEVENLABS_API_KEY")
 SECRET_KEY=os.getenv("SECRET_KEY")
 DB_CONNECTION_URL = os.getenv("DB_CONNECTION_URL")

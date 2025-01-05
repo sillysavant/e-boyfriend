@@ -2,4 +2,15 @@
 /env/*
 /app/audio/*
 /app/logs/*
+/app/constant/OAI_CONFIG_LIST.json
+/tmp/*
+*.ipynb
+/test/*
 *.wav
+/pgvector/*
+/bin/*
+/static/*
+*.crt.pem
+*.pdf
+/output/*
+/notebook/*
