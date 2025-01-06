@@ -115,6 +115,23 @@ export function Girlfriend(props) {
 
   const [lipsync, setLipsync] = useState();
 
+  const audioQueue = useRef([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const currentTime = useRef(0);
+  const frameRef = useRef({
+    audio: null,
+    lipsync: null,
+    isPlaying: false,
+  });
+
+  useEffect(() => {
+    frameRef.current = {
+      audio,
+      lipsync,
+      isPlaying,
+    };
+  }, [lipsync, isPlaying]);
+
   useEffect(() => {
     console.log("Avatar:", JSON.stringify(message, null, 2));
     if (!message) {
@@ -124,13 +141,92 @@ export function Girlfriend(props) {
     setAnimation(message.animation);
     setFacialExpression(message.facialExpression);
     setLipsync(message.lipsync);
-    const audio = new Audio("data:audio/mp3;base64," + audioRes);
-    console.log("audio", audio);
-    audio.play();
-    setAudio(audio);
-    audio.onended = onMessagePlayed;
+    // const audio = new Audio("data:audio/mp3;base64," + audioRes);
+    // console.log("audio", audioRes);
+    // audio.play();
+    // setAudio(audio);
+    // audio.onended = onMessagePlayed;
+
+    if (!audioRes || !Array.isArray(audioRes)) {
+      setAnimation("Idle");
+      resetState();
+      return;
+    }
+
+    // Store the audio queue
+    audioQueue.current = audioRes.map((audioData) => ({
+      audio: new Audio(`data:audio/mp3;base64,${audioData}`),
+      played: false,
+    }));
+
+    // Start playing the first audio
+    playNextAudio();
+
+    // Cleanup function
+    return () => {
+      if (frameRef.current.audio) {
+        frameRef.current.audio.pause();
+        frameRef.current.audio.currentTime = 0;
+      }
+      resetState();
+    };
   }, [audioRes]);
 
+  const resetState = () => {
+    setAudio(null);
+    setLipsync(null);
+    setIsPlaying(false);
+  };
+
+  const playNextAudio = () => {
+    const currentIndex = audioQueue.current.findIndex((item) => !item.played);
+
+    if (currentIndex === -1 || !message) {
+      setAnimation("Idle");
+      resetState();
+      return;
+    }
+
+    const currentMessage = Array.isArray(message)
+      ? message[currentIndex]
+      : message;
+    setAnimation(currentMessage.animation);
+    setFacialExpression(currentMessage.facialExpression);
+    setLipsync(currentMessage.lipsync);
+
+    const currentAudioItem = audioQueue.current[currentIndex];
+    const audioElement = currentAudioItem.audio;
+
+    audioElement.onended = () => {
+      currentAudioItem.played = true;
+      if (currentIndex === audioQueue.current.length - 1) {
+        resetState();
+        onMessagePlayed();
+        setAnimation("Idle");
+      } else {
+        playNextAudio();
+      }
+    };
+
+    audioElement.onplay = () => {
+      setIsPlaying(true);
+    };
+
+    audioElement.onpause = () => {
+      setIsPlaying(false);
+    };
+
+    // Update currentTime in animation frame
+    audioElement.ontimeupdate = () => {
+      currentTime.current = audioElement.currentTime;
+    };
+
+    setAudio(audioElement);
+    audioElement.play().catch((error) => {
+      console.error("Error playing audio:", error);
+      setIsPlaying(false);
+    });
+  };
   const { animations } = useGLTF("/models/animations.glb");
 
   const group = useRef();
