@@ -41,19 +41,21 @@ const Dots = (props) => {
 
 export const Experience = () => {
   const cameraControls = useRef();
-  const { cameraZoomed } = useChat();
+  const { zoomLevel } = useChat();
 
   useEffect(() => {
-    cameraControls.current.setLookAt(0, 1.5, 5, 0, 1.0, 0);
-  }, []);
+    // Different positions based on zoom level
+    const zoomPositions = {
+      0: [0, 1.5, 5, 0, 1.0, 0], // Default view
+      1: [0, 1.0, 1.5, 0, 1.0, 0], // First zoom
+      2: [0, 0.8, 1.0, 0, 1.0, 0], // Closer
+      3: [0, 0.6, 0.7, 0, 1.0, 0], // Very close
+    };
 
-  useEffect(() => {
-    if (cameraZoomed) {
-      cameraControls.current.setLookAt(0, 1.0, 1.5, 0, 1.0, 0, true);
-    } else {
-      cameraControls.current.setLookAt(0, 1.5, 5, 0, 0.5, 0, true);
-    }
-  }, [cameraZoomed]);
+    const [px, py, pz, tx, ty, tz] = zoomPositions[zoomLevel];
+    cameraControls.current.setLookAt(px, py, pz, tx, ty, tz, true);
+  }, [zoomLevel]);
+
   return (
     <>
       <CameraControls ref={cameraControls} />

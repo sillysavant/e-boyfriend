@@ -16,6 +16,7 @@ export const ChatProvider = ({ children }) => {
   const [cameraZoomed, setCameraZoomed] = useState(false);
   const [audioRes, setAudioRes] = useState();
   const [messages, setMessages] = useState([]);
+  const [zoomLevel, setZoomLevel] = useState(0); // 0 = default, 1 = first zoom, 2 = closer, etc.
 
   const onMessagePlayed = () => {
     setMessages((messages) => messages.slice(1));
@@ -69,6 +70,14 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev + 1, 3)); // Max 3 zoom levels
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev - 1, 0));
+  };
+
   // Provide the context values
   return (
     <ChatContext.Provider
@@ -80,6 +89,9 @@ export const ChatProvider = ({ children }) => {
         cameraZoomed,
         setCameraZoomed,
         onMessagePlayed,
+        zoomLevel,
+        handleZoomIn,
+        handleZoomOut,
       }}
     >
       {children}
