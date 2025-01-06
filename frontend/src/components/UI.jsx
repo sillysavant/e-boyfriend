@@ -8,6 +8,7 @@ import settingIcon from "../assets/setting.svg";
 import SettingsModal from "./SettingsModal";
 import typeIcon from "../assets/type.svg";
 import ChatMessages from "./ChatMessages";
+import api from "../services/api";
 
 export const UI = ({ hidden, ...props }) => {
   const { chat, loading, handleZoomIn, handleZoomOut, zoomLevel } = useChat();
@@ -35,10 +36,13 @@ export const UI = ({ hidden, ...props }) => {
     setInputMode("voice");
   };
 
-  const handleSelectType = (message) => {
+  const handleSelectType = async (message) => {
     setMessages((prev) => [...prev, message]);
-    // Add your text processing logic here
-    console.log("Sending message:", message);
+    try {
+      await chat({ text: message });
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   const handleSwitchToType = () => {
