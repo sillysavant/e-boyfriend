@@ -167,4 +167,4 @@ async def remove_from_azure_search_index(filename: str, index_name:str):
             break
         res = search_client.delete_documents(documents=[{ "id": doc["id"] } for doc in search_res])
         print(f"\tRemoved {len(res)} sections from index")
- 
+

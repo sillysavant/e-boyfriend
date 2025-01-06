@@ -91,8 +91,8 @@ ssl_context.verify_mode = ssl.CERT_REQUIRED
 
 connect_args = {"ssl": ssl_context}
 
-session_manager = DatabaseSessionManager(COSMOS_CONNECTION_URL, engine_kwargs={"connect_args": connect_args})
-#session_manager = DatabaseSessionManager(DB_CONNECTION_URL)
+# session_manager = DatabaseSessionManager(COSMOS_CONNECTION_URL, engine_kwargs={"connect_args": connect_args})
+session_manager = DatabaseSessionManager(DB_CONNECTION_URL)
 
 async def get_db():
     async with session_manager.session() as session:

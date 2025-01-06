@@ -3,8 +3,6 @@ from typing import Optional
 from sqlalchemy import select, text
 from app.constant.config import OPENAPI_KEY
 from app.database.models.message import Sessions, Messages
-from sqlalchemy.orm import Session
-from langchain_openai import OpenAIEmbeddings
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schema.conversation import ChatMessageHistory
 from app.utils.azure_document_search import generate_embeddings
@@ -63,8 +61,8 @@ async def retrieve_similar_messages(
 ):
     # generate the embedding
     escaped_query = await escape_single_quote_helper(query)
-    embeddings = OpenAIEmbeddings(model=model, api_key=OPENAPI_KEY)
-    embedding = embeddings.embed_query(escaped_query)
+    embedding = await generate_embeddings(text = escaped_query, dimensions=1536)
+    
     embedding_string = f"[{','.join(str(x) for x in embedding)}]"
     
     query_string= text(f"""

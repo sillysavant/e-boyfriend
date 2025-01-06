@@ -4,7 +4,6 @@ import os
 import openai
 from app.constant.assistant import INSTRUCTION
 from app.constant.config import OPENAI_MODEL, OPENAPI_KEY
-from duckduckgo_search import DDGS
 
 class Assistant:
     assistant_id = None

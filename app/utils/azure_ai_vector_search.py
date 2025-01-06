@@ -179,3 +179,15 @@ class CustomAzureSearch:
                 )  
             
             return await self.__get_results_to_return(results)
+        
+async def get_documents_from_index(index_name: str, document_id: str) -> dict | None:
+    credential = AzureKeyCredential(AZURE_AI_SEARCH_KEY)
+    search_client = SearchClient(
+        endpoint=AZURE_AI_SEARCH_URI,
+        index_name=index_name,
+        credential=credential)
+    
+    async with search_client:
+        result = await search_client.get_document(key=document_id)
+        return result
+    

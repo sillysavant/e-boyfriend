@@ -37,7 +37,7 @@ def get_headers() -> dict:
         "Referer": "https://www.google.com/"
     }
     
-async def scrape_page(urls: list[Annotated[str, "The URL of the web page to scrape"]]) -> Annotated[dict, "Scraped content"]:
+def scrape_page(urls: list[Annotated[str, "The URL of the web page to scrape"]]) -> Annotated[dict, "Scraped content"]:
     # Initialize the ApifyClient with your API token
         
     client = CustomApifyClient(token=APIFY_KEY, headers=get_headers())
@@ -131,7 +131,7 @@ async def scrape_page(urls: list[Annotated[str, "The URL of the web page to scra
 
     return results
 
-async def search_internet(query:str, max_results:int = 3) -> list[Annotated[dict, "Scraped content"]]:
+def search_internet(query:str, max_results:int = 3) -> list[Annotated[dict, "Scraped content"]]:
     """
     Search Skill
     Search Tool
@@ -147,7 +147,7 @@ async def search_internet(query:str, max_results:int = 3) -> list[Annotated[dict
     with DDGS(headers=get_headers()) as ddgs:
         urls = [{"url": r['href']} for r in ddgs.text(query, max_results=max_results)]
         #print(f"============ SCRAPING URLS: {urls} =============== \n")
-        res = await scrape_page(urls=urls)
+        res = scrape_page(urls=urls)
         return res
 
 async def get_current_date_time() -> Annotated[str, "Current date and time"]:

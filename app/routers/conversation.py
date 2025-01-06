@@ -5,12 +5,14 @@ from app.assistance.agents import IntentClassifier, Reformulate_agent, Relations
 from fastapi import APIRouter, HTTPException, Request, UploadFile, File, status
 from app.assistance.conversation_agent import Conversation_Agent, get_conversation_agent
 from app.assistance.documents_reading_agent import DocumentReadingAgent, get_document_reading_agent
+from app.assistance.memory_agent import MemoryAgent, get_memory_agent
 from app.assistance.scrape_agent import WebSearchAgent, get_web_scaper_agent
 from app.assistance.thread_manager import ThreadManager
 from app.database.database import get_db, run_with_session
 from app.database.query import db_message
 from app.schema.conversation import ChatRequest
 from app.services.azure_docs_intel_service import upload_docs
+from app.services import memory_service
 from app.services.transcripts import transcript
 from app.services.tts import text_to_speech
 from app.utils.azure_blob_helper import AzureBlobHelper
@@ -35,7 +37,8 @@ async def chat(
     conversation_agent: Conversation_Agent = Depends(get_conversation_agent),
     web_search_agent: WebSearchAgent = Depends(get_web_scaper_agent),
     intent_classifier: IntentClassifier = Depends(get_intent_classifier),
-    document_reading_agent: DocumentReadingAgent = Depends(get_document_reading_agent)
+    document_reading_agent: DocumentReadingAgent = Depends(get_document_reading_agent),
+    memory_agent: MemoryAgent = Depends(get_memory_agent)
 ):
     try: 
         query = chat_request.text
@@ -47,6 +50,7 @@ async def chat(
         # request process
         response = await conversation_service.chat(
             db = db, 
+            background_task=background_task,
             message=query, 
             session_id=session_id,
             user_proxy=user_proxy,
@@ -55,7 +59,8 @@ async def chat(
             conversation_agent=conversation_agent,
             web_search_agent = web_search_agent,
             intent_classifier = intent_classifier,
-            document_reading_agent = document_reading_agent
+            document_reading_agent = document_reading_agent,
+            memory_agent = memory_agent
         )
 
         # Parse the chatbot response text

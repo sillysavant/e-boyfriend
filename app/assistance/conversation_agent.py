@@ -39,6 +39,7 @@ class Conversation_Agent(GPTAssistantAgent):
         # configure the conversation agent
         #self.teachability = self._initialize_teach_partner()
         #self.teachability.add_to_agent(self)
+        
         self.context_handler = self.add_context_handler()
         self.context_handler.add_to_agent(self)
         

@@ -1,11 +1,12 @@
 # Created: dylannguyen
+from datetime import datetime
 import json
 import autogen
-from autogen.agentchat.contrib.gpt_assistant_agent import GPTAssistantAgent
-from fastapi import Depends, HTTPException, status
+from fastapi import BackgroundTasks, Depends, HTTPException, status
 from app.assistance.agents import IntentClassifier, Reformulate_agent, Relationship_Consulting_agent, UserProxy
 from app.assistance.conversation_agent import Conversation_Agent
 from app.assistance.documents_reading_agent import DocumentReadingAgent
+from app.assistance.memory_agent import MemoryAgent
 from app.assistance.scrape_agent import WebSearchAgent, get_current_date_time
 from app.constant.config import CONFIG_LIST
 from app.database.query import db_message
@@ -14,31 +15,27 @@ from autogen.agentchat.contrib.capabilities.transforms import TextMessageCompres
 from sqlalchemy.ext.asyncio import AsyncSession
 import re
 
-from app.services.azure_ai_search_service import get_results_vector_search
-async def add_assistant_message(db:AsyncSession, session_id: str, response):
+from app.schema.conversation import MessageConversation
+from app.services import memory_service
+
+async def get_assistant_response(response):
+    response_json = json.loads(response[-1].chat_history[-1]['content'])
+    message = ""
     try:
-        response_json = json.loads(response[-1].chat_history[-1]['content'])
-        message = ""
-        try:
-            mess_list = response_json['messages']
-        except KeyError:
-            mess_list = response_json['responses']
-        except KeyError:
-            mess_list = response_json["response"]
-        for mess in mess_list:
-            message += mess['text'] + "\n"
-        if message:
-            await db_message.add_messages(db=db, session_id=session_id, role="assistant", content=message)
-    except json.JSONDecodeError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to decode the response from the assistant"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+        mess_list = response_json['messages']
+    except KeyError:
+        mess_list = response_json['responses']
+    except KeyError:
+        mess_list = response_json["response"]
+    for mess in mess_list:
+        message += mess['text'] + "\n"
+    return message
+
+async def add_assistant_message(db:AsyncSession, session_id: str, response):
+    message = await get_assistant_response(response)
+    
+    if message:
+        await db_message.add_messages(db=db, session_id=session_id, role="assistant", content=message)
 
 async def add_user_message(db:AsyncSession, session_id: str, message: str):
     await db_message.add_messages(db=db, session_id=session_id, role="user", content=message)
@@ -152,6 +149,7 @@ async def reset_agent(agents: list):
 
 async def chat(
     db: AsyncSession, 
+    background_task: BackgroundTasks,
     message: str, 
     session_id: str,
     user_proxy: UserProxy,
@@ -160,9 +158,11 @@ async def chat(
     conversation_agent: Conversation_Agent,
     web_search_agent: WebSearchAgent,
     intent_classifier: IntentClassifier,
-    document_reading_agent: DocumentReadingAgent
+    document_reading_agent: DocumentReadingAgent,
+    memory_agent: MemoryAgent
 ):
     # get context from db
+    user_asked_time = datetime.utcnow().isoformat(timespec='seconds') + 'Z'
     rec_context, sim_context = await get_context(db=db, session_id=session_id, query=message)
     contextualize_q_system_prompt = await get_contextualize_q_system_prompt(problem=message, rec_context=rec_context)
     
@@ -211,4 +211,13 @@ async def chat(
         
     # chat with agents
     res = user_proxy.initiate_chats(chat_queue=chat_queue)
+    
+    # BACKGROUND: save useful user's information
+    assistant_message = await get_assistant_response(res)
+    conv_chat = [
+        MessageConversation(role = "user", content = reformulated_message, time = user_asked_time),
+        MessageConversation(role = "assistant", content = assistant_message, time = datetime.utcnow().isoformat(timespec='seconds') + 'Z'),
+    ]
+    background_task.add_task(memory_service.save_memory_service, memory_agent, conv_chat)
+    
     return res
