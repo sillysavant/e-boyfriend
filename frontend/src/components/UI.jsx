@@ -6,6 +6,7 @@ import zoomInIcon from "../assets/zoomin.svg";
 import zoomOutIcon from "../assets/zoomout.svg";
 import settingIcon from "../assets/setting.svg";
 import SettingsModal from "./SettingsModal";
+import typeIcon from "../assets/type.svg";
 
 export const UI = ({ hidden, ...props }) => {
   const { chat, loading, handleZoomIn, handleZoomOut, zoomLevel } = useChat();
@@ -38,6 +39,10 @@ export const UI = ({ hidden, ...props }) => {
     // You can add your text processing logic here
   };
 
+  const handleSwitchToType = () => {
+    setInputMode(null); // This will show the InputSelector again
+  };
+
   const renderInputMethod = () => {
     if (!inputMode) {
       return (
@@ -53,6 +58,7 @@ export const UI = ({ hidden, ...props }) => {
           uploadAudio={handleAudioUpload}
           loading={loading}
           autoStart={true}
+          onSwitchToType={handleSwitchToType}
         />
       );
     }
@@ -70,7 +76,7 @@ export const UI = ({ hidden, ...props }) => {
           <img src={settingIcon} alt="Settings" className="w-6 h-6" />
         </button>
 
-        {/* Right side zoom controls */}
+        {/* Right side controls */}
         <div className="fixed right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
           <button
             onClick={handleZoomIn}
@@ -100,6 +106,16 @@ export const UI = ({ hidden, ...props }) => {
           >
             <img src={zoomOutIcon} alt="Zoom out" className="w-6 h-6" />
           </button>
+          {inputMode === "voice" && (
+            <button
+              onClick={handleSwitchToType}
+              className="pointer-events-auto p-2 rounded-[6px] border-[1.51px] border-white/10 
+                bg-[rgba(205,205,205,0.60)] shadow-[0px_4.96px_62.003px_0px_rgba(0,0,0,0.19)] 
+                backdrop-blur-[5.9px] transition-all duration-300 hover:bg-[rgba(205,205,205,0.75)]"
+            >
+              <img src={typeIcon} alt="Switch to typing" className="w-6 h-6" />
+            </button>
+          )}
         </div>
 
         {/* Bottom input method */}

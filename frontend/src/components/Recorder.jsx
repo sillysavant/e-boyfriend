@@ -2,10 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import notActiveAssistantIcon from "../assets/voice.svg";
+import typeIcon from "../assets/type.svg";
 
 const mimeType = "audio/webm";
 
-const Recorder = ({ uploadAudio, loading, autoStart = false }) => {
+const Recorder = ({
+  uploadAudio,
+  loading,
+  autoStart = false,
+  onSwitchToType,
+}) => {
   const [permission, setPermission] = useState(false);
   const [stream, setStream] = useState(null);
   const mediaRecorder = useRef(null);
