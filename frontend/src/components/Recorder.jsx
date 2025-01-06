@@ -1,10 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import activeAssistantIcon from "../assets/active.gif";
-import notActiveAssistantIcon from "../assets/inactive.png";
+import notActiveAssistantIcon from "../assets/voice.svg";
 
 const mimeType = "audio/webm";
+
+const pulseAnimation = `
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+`;
 
 function Recorder({ uploadAudio, loading }) {
   const mediaRecorder = useRef();
@@ -71,24 +84,19 @@ function Recorder({ uploadAudio, loading }) {
         <button onClick={getMicrophonePermission} type="button">
           Get Microphone
         </button>
-      ) : recordingStatus === "inactive" ? (
-        <img
-          src={notActiveAssistantIcon}
-          alt="Not Recording"
-          width={70}
-          height={70}
-          onClick={startRecording}
-          className="assistant cursor-pointer hover:scale-110 duration-150 transition-all ease-in-out"
-          disabled={loading}
-        />
       ) : (
         <img
-          src={activeAssistantIcon}
-          alt="Recording"
-          width={70}
-          height={70}
-          onClick={stopRecording}
-          className="assistant cursor-pointer hover:scale-110 duration-150 transition-all ease-in-out"
+          src={notActiveAssistantIcon}
+          alt={recordingStatus === "inactive" ? "Not Recording" : "Recording"}
+          width={150}
+          height={150}
+          onClick={
+            recordingStatus === "inactive" ? startRecording : stopRecording
+          }
+          className={`assistant cursor-pointer hover:scale-110 duration-150 transition-all ease-in-out ${
+            recordingStatus === "recording" ? "animate-pulse" : ""
+          }`}
+          disabled={loading}
         />
       )}
     </div>
