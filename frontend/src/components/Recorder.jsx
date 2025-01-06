@@ -32,7 +32,7 @@ const Recorder = ({ uploadAudio, loading, autoStart = false }) => {
   }, []);
 
   const startRecording = (streamData) => {
-    const media = new MediaRecorder(streamData, { type: mimeType });
+    const media = new MediaRecorder(streamData || stream, { type: mimeType });
     mediaRecorder.current = media;
     mediaRecorder.current.start();
     setRecordingStatus("recording");
@@ -57,14 +57,22 @@ const Recorder = ({ uploadAudio, loading, autoStart = false }) => {
     }
   };
 
+  const handleClick = () => {
+    if (recordingStatus === "recording") {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   return (
     <div className="flex justify-center items-center">
       <button
         className={`transition-all duration-300 ${
           recordingStatus === "recording" ? "animate-pulse" : ""
         }`}
-        onClick={stopRecording}
-        disabled={loading || recordingStatus !== "recording"}
+        onClick={handleClick}
+        disabled={loading}
       >
         <img
           src={notActiveAssistantIcon}

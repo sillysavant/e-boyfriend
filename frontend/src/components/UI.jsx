@@ -32,9 +32,10 @@ export const UI = ({ hidden, ...props }) => {
     setInputMode("voice");
   };
 
-  const handleSelectType = () => {
-    setInputMode("type");
-    // Implement typing functionality here
+  const handleSelectType = (message) => {
+    // Handle text message submission here
+    console.log("Sending message:", message);
+    // You can add your text processing logic here
   };
 
   const renderInputMethod = () => {
