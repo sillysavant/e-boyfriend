@@ -72,7 +72,7 @@ const Recorder = ({
   };
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex justify-center items-end h-[calc(10vh-10px)]">
       <button
         className={`transition-all duration-300 ${
           recordingStatus === "recording" ? "animate-pulse" : ""

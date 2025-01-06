@@ -7,11 +7,13 @@ import zoomOutIcon from "../assets/zoomout.svg";
 import settingIcon from "../assets/setting.svg";
 import SettingsModal from "./SettingsModal";
 import typeIcon from "../assets/type.svg";
+import ChatMessages from "./ChatMessages";
 
 export const UI = ({ hidden, ...props }) => {
   const { chat, loading, handleZoomIn, handleZoomOut, zoomLevel } = useChat();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [inputMode, setInputMode] = useState(null); // null, 'voice', or 'type'
+  const [messages, setMessages] = useState([]);
 
   const handleAudioUpload = async (blob) => {
     try {
@@ -34,9 +36,9 @@ export const UI = ({ hidden, ...props }) => {
   };
 
   const handleSelectType = (message) => {
-    // Handle text message submission here
+    setMessages((prev) => [...prev, message]);
+    // Add your text processing logic here
     console.log("Sending message:", message);
-    // You can add your text processing logic here
   };
 
   const handleSwitchToType = () => {
@@ -75,6 +77,9 @@ export const UI = ({ hidden, ...props }) => {
         >
           <img src={settingIcon} alt="Settings" className="w-6 h-6" />
         </button>
+
+        {/* Messages */}
+        <ChatMessages messages={messages} />
 
         {/* Right side controls */}
         <div className="fixed right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
