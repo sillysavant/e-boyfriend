@@ -7,7 +7,7 @@ backend/.env
 /env/*
 /app/audio/*
 /app/logs/*
-OAI_CONFIG_LIST.json
+/OAI_CONFIG_LIST.json
 /tmp/*
 *.ipynb
 /test/*
